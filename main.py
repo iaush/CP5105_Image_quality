@@ -71,14 +71,14 @@ def calculate_overall_score_without_FOV( image, exposure_model, blur_model ):
   # FOV Score
 
   # Exposure Score
-  ax[0].barh(['Exposure Score'], [exposure_score], color='green', alpha=0.7)
-  ax[0].set_ylim(0, 1)
+  ax[0].barh(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
+  ax[0].set_xlim(0, 1)
   ax[0].set_title('Exposure Score')
   ax[0].set_xlabel('Score')
 
   # Blur Score
   ax[1].barh(['Blur Score'], [blur_score], color='red', alpha=0.7)
-  ax[1].set_ylim(0, 1)
+  ax[1].set_xlim(0, 1)
   ax[1].set_title('Blur Score')
   ax[1].set_xlabel('Score')
 
