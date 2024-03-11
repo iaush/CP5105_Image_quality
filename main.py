@@ -63,24 +63,25 @@ def calculate_overall_score_without_FOV( image, exposure_model, blur_model ):
 
 
   st.write("No references given, FOV score is not calculayed")
-  st.write("Exposure score : {}, Blur score : {} ".format(exposure_score[0], blur_score))
+  
 
   
-  fig, ax = plt.subplots(2, 1, figsize=(6, 10))
+  fig, ax = plt.subplots(1, 2, figsize=(6, 6))
 
   # FOV Score
 
   # Exposure Score
-  ax[0].barh(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
-  ax[0].set_xlim(0, 1)
+  ax[0].bar(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
+  ax[0].set_ylim(0, 1)
   ax[0].set_title('Exposure Score')
-  ax[0].set_xlabel('Score')
+ 
 
   # Blur Score
-  ax[1].barh(['Blur Score'], [blur_score], color='red', alpha=0.7)
-  ax[1].set_xlim(0, 1)
+  ax[1].bar(['Blur Score'], [blur_score], color='red', alpha=0.7)
+  ax[1].set_ylim(0, 1)
   ax[1].set_title('Blur Score')
-  ax[1].set_xlabel('Score')
+
+  st.write("Exposure score : {}, Blur score : {} ".format(exposure_score[0], blur_score))
 
   # Adjust layout
   plt.tight_layout()
@@ -196,7 +197,7 @@ def calculate_similarity_score(img_folder_path, similar_keypoints, similar_descr
     sift = cv2.SIFT_create()
     bf = cv2.BFMatcher()
 
-    img2 = cv2.imread(str(img_folder_path),0)
+    img2 = img_folder_path
 
     keypoints2, descriptors2 = sift.detectAndCompute(img2, None)
 
@@ -244,7 +245,7 @@ def generate_basket_for_similarity(image_filenames):
 
   # Loop through the images and extract keypoints/descriptors
   for filename in image_filenames:
-      img = cv2.imread(filename, 0) # Read the image in grayscale
+      img = filename # Read the image in grayscale
       keypoints, descriptors = sift.detectAndCompute(img, None)
       keypoints_list.append((filename, keypoints))  # Store keypoints along with the filename
       descriptors_list.append((filename, descriptors))  # Store descriptors along with the filename
@@ -286,16 +287,33 @@ def calculate_overall_score( image, references , exposure_model, blur_model ):
 
   # print(f"FOV score : {total_score}, Exposure score : {exposure_score}, Blur score : {blur_score} ")
 
+  fig, ax = plt.subplots(1, 3, figsize=(6, 6))
+
+  # FOV Score
+
+  # Exposure Score
+  ax[0].bar(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
+  ax[0].set_ylim(0, 1)
+  ax[0].set_title('Exposure Score')
+
+  # Blur Score
+  ax[1].bar(['Blur Score'], [blur_score], color='red', alpha=0.7)
+  ax[1].set_ylim(0, 1)
+  ax[1].set_title('Blur Score')
+
+  ax[2].bar(['FOV Score'], [total_score], color='blue', alpha=0.7)
+  ax[2].set_ylim(0, 1)
+  ax[2].set_title('FOV Score')
+
+  # Adjust layout
+  plt.tight_layout()
+
+  # Display the plot using st.pyplot
+  st.pyplot(fig)
   
   st.write("FOV score : {}, Exposure score : {}, Blur score : {}".format(total_score, exposure_score[0], blur_score))
 
-  scores_data = {
-    'FOV Score': total_score,
-    'Exposure Score': exposure_score,
-    'Blur Score': blur_score
-}
 
-  st.bar_chart(scores_data, use_container_width=True)
 
   print([total_score, exposure_score[0], blur_score])
 
@@ -315,4 +333,4 @@ if uploaded_file is not None:
       processed_data = calculate_overall_score( image,references, exposure_model, blur_model )
 
     # Display processed information
-    st.write("Processed Information:", processed_data)
+    # st.write("Processed Information:", processed_data)
