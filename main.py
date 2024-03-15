@@ -18,18 +18,18 @@ import matplotlib.pyplot as plt
 
 exposure_model = joblib.load('exposure_random_forest_model.joblib')
 blur_model = pickle.load(open('rf_regressor_model.sav','rb'))
-# Page setup
-st.title("Image Quality Assessment Metric")
 
-# Upload image through Streamlit
+st.title("Image Quality Assessment Metric")
 
 references = []
 
 progress_max = 3
-
-reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-
+st.write("<h3 style='font-weight: bold; text-align : centre'> 3 Reference images needed for FOV calculation", unsafe_allow_html=True)
 progress_bar = st.progress(0)
+# st.write("<h3 style='font-weight: bold; text-align : centre'> Upload reference images", unsafe_allow_html=True)
+reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+# reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+
 
 if(len(reference_file)>3):
   reference_file.pop(1)
@@ -51,8 +51,8 @@ if(len(references)>1):
   # Display concatenated image with slight spacing
   st.image(concatenated_image, caption="Concatenated Reference Images", use_column_width=True)
 
-
-uploaded_file = st.file_uploader("Upload image to test for quality", type=["jpg", "jpeg", "png"])
+st.write("<h3 style='font-weight: bold; text-align : centre'> Upload image to test", unsafe_allow_html=True)
+uploaded_file = st.file_uploader(label_visibility = "collapsed", label= "Upload image to test", type=["jpg", "jpeg", "png"])
 
 def calculate_overall_score_without_FOV( image, exposure_model, blur_model ):
 
