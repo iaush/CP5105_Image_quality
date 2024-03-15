@@ -18,17 +18,47 @@ import matplotlib.pyplot as plt
 
 exposure_model = joblib.load('exposure_random_forest_model.joblib')
 blur_model = pickle.load(open('rf_regressor_model.sav','rb'))
+st.markdown(
+    """
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden;
+    }
+    .app-container {
+        height: 100vh;
+        width : 100vw;
+        overflow: hidden;
+    }
+    .block-container{
+      padding: 3vh 3vw;
+      max-width: 100%;
+    }
 
-st.title("Image Quality Assessment Metric")
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+# st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
+# st.title("Image Quality Assessment Metric")
+
+st.write("<h3 style='font-weight: bold; text-align : centre'> Image Quality Assessment Metric", unsafe_allow_html=True)
 
 references = []
 
+col1, col2 = st.columns(2)
+sub_col1, sub_col2 = col2.columns(2)
+
 progress_max = 3
-st.write("<h3 style='font-weight: bold; text-align : centre'> 3 Reference images needed for FOV calculation", unsafe_allow_html=True)
-progress_bar = st.progress(0)
-# st.write("<h3 style='font-weight: bold; text-align : centre'> Upload reference images", unsafe_allow_html=True)
-reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-# reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+with col1:
+  st.write("<h5 style='font-weight: bold; text-align : centre'> 3 Reference images needed for FOV calculation", unsafe_allow_html=True)
+  progress_bar = st.progress(0)
+  # st.write("<h3 style='font-weight: bold; text-align : centre'> Upload reference images", unsafe_allow_html=True)
+  reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+  # reference_file = st.file_uploader("Upload reference images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
 
 if(len(reference_file)>3):
@@ -49,10 +79,12 @@ if(len(references)>1):
   concatenated_image = np.concatenate(references, axis=1)
 
   # Display concatenated image with slight spacing
-  st.image(concatenated_image, caption="Concatenated Reference Images", use_column_width=True)
+  with col1:
+    st.image(concatenated_image, caption="Concatenated Reference Images")
 
-st.write("<h3 style='font-weight: bold; text-align : centre'> Upload image to test", unsafe_allow_html=True)
-uploaded_file = st.file_uploader(label_visibility = "collapsed", label= "Upload image to test", type=["jpg", "jpeg", "png"])
+with col2:
+  st.write("<h5 style='font-weight: bold; text-align : centre'> Upload image to test", unsafe_allow_html=True)
+  uploaded_file = st.file_uploader(label_visibility = "collapsed", label= "Upload image to test", type=["jpg", "jpeg", "png"])
 
 def calculate_overall_score_without_FOV( image, exposure_model, blur_model ):
 
@@ -61,33 +93,34 @@ def calculate_overall_score_without_FOV( image, exposure_model, blur_model ):
 
   blur_score = calculate_blur_rf(image, blur_model)
 
-
-  st.write("No references given, FOV score is not calculayed")
   
 
-  
-  fig, ax = plt.subplots(1, 2, figsize=(6, 6))
+  with col2:
+    sub_col1, sub_col2 = st.columns(2)
+    with sub_col1:
+      st.image(image,caption= 'Uploaded Image')
+    with sub_col2:
+      # st.write("No references given, FOV score is not calculated")
+      fig, ax = plt.subplots(1, 2, figsize=(6, 6))
 
-  # FOV Score
+            # FOV Score
 
-  # Exposure Score
-  ax[0].bar(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
-  ax[0].set_ylim(0, 1)
-  ax[0].set_title('Exposure Score')
- 
+            # Exposure Score
+      ax[0].bar(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
+      ax[0].set_ylim(0, 1)
+      ax[0].set_title('Exposure Score')
+          
 
-  # Blur Score
-  ax[1].bar(['Blur Score'], [blur_score], color='red', alpha=0.7)
-  ax[1].set_ylim(0, 1)
-  ax[1].set_title('Blur Score')
+            # Blur Score
+      ax[1].bar(['Blur Score'], [blur_score], color='red', alpha=0.7)
+      ax[1].set_ylim(0, 1)
+      ax[1].set_title('Blur Score')
 
-  st.write("Exposure score : {}, Blur score : {} ".format(exposure_score[0], blur_score))
-
-  # Adjust layout
-  plt.tight_layout()
-
-  # Display the plot using st.pyplot
-  st.pyplot(fig)
+      # st.write("Exposure score : {}, Blur score : {} ".format(exposure_score[0], blur_score))
+            # Display the plot using st.pyplot
+      st.pyplot(fig)
+    st.write("Exposure score : {:.5f}, Blur score : {:.5f}".format(exposure_score[0], blur_score))
+    
 
 
   print(f"Exposure score : {exposure_score}, Blur score : {blur_score} ")
@@ -286,32 +319,36 @@ def calculate_overall_score( image, references , exposure_model, blur_model ):
   blur_score = calculate_blur_rf(image, blur_model)
 
   # print(f"FOV score : {total_score}, Exposure score : {exposure_score}, Blur score : {blur_score} ")
+  with col2:
+    sub_col1, sub_col2 = st.columns(2)
+    with sub_col1:
+      st.image(image,caption= 'Uploaded Image')
+    with sub_col2:
+      fig, ax = plt.subplots(1, 3, figsize=(8, 8))
 
-  fig, ax = plt.subplots(1, 3, figsize=(6, 6))
+      # FOV Score
 
-  # FOV Score
+      # Exposure Score
+      ax[0].bar(['Exposure'], [exposure_score[0]], color='green', alpha=0.7)
+      ax[0].set_ylim(0, 1)
+      ax[0].set_title('Exposure')
 
-  # Exposure Score
-  ax[0].bar(['Exposure Score'], [exposure_score[0]], color='green', alpha=0.7)
-  ax[0].set_ylim(0, 1)
-  ax[0].set_title('Exposure Score')
+      # Blur Score
+      ax[1].bar(['Blur'], [blur_score], color='red', alpha=0.7)
+      ax[1].set_ylim(0, 1)
+      ax[1].set_title('Blur')
 
-  # Blur Score
-  ax[1].bar(['Blur Score'], [blur_score], color='red', alpha=0.7)
-  ax[1].set_ylim(0, 1)
-  ax[1].set_title('Blur Score')
+      ax[2].bar(['FOV'], [total_score], color='blue', alpha=0.7)
+      ax[2].set_ylim(0, 1)
+      ax[2].set_title('FOV')
 
-  ax[2].bar(['FOV Score'], [total_score], color='blue', alpha=0.7)
-  ax[2].set_ylim(0, 1)
-  ax[2].set_title('FOV Score')
+      # Adjust layout
+      
 
-  # Adjust layout
-  plt.tight_layout()
-
-  # Display the plot using st.pyplot
-  st.pyplot(fig)
-  
-  st.write("FOV score : {}, Exposure score : {}, Blur score : {}".format(total_score, exposure_score[0], blur_score))
+      # Display the plot using st.pyplot
+      st.pyplot(fig)
+    
+    st.write("Exposure score : {:.5f}, Blur score : {:.5f}, FOV score : {:.5f}".format(exposure_score[0], blur_score, total_score))
 
 
 
@@ -323,7 +360,12 @@ def calculate_overall_score( image, references , exposure_model, blur_model ):
 if uploaded_file is not None:
     # Display the uploaded image
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    resized_image = image.resize((200, 200))
+
+    # with col2:
+    #   sub_col1, sub_col2 = st.columns(2)
+    #   with sub_col1:
+    #     st.image(resized_image,caption= 'Uploaded Image')
 
     image = np.array(image)
     # Process the image (you can replace this with your own processing logic)
